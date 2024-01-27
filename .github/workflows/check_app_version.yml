@@ -25,7 +25,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git commit -am "New tmux release version"
+          git commit -am "New release version"
           git push
 
       - name: Build the Docker image
@@ -44,7 +44,7 @@ jobs:
         with:
           allowUpdates: True
           tag: ${{ steps.build.outputs.REDUCE_RELEASE_TAG }}
-          name: tmux ${{ steps.build.outputs.REDUCE_RELEASE_TAG }}
+          name: ${{ steps.build.outputs.REDUCE_RELEASE_TAG }}
           prerelease: False
           artifacts: 'reduce.appimage'
           token: ${{ secrets.GITHUB_TOKEN }}
