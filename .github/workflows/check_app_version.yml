@@ -38,13 +38,47 @@ jobs:
           docker build . -t reduce --build-arg REDUCE_RELEASE_TAG=$REDUCE_RELEASE_TAG
           docker create -ti --name reducecontainer reduce bash
           docker cp reducecontainer:/opt/build/reduce.appimage .
-      - name: Create Release
-        if: steps.git-check.outputs.modified == 'true'
-        uses: ncipollo/release-action@v1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: reduce.appimage
+
+  macos:
+    runs-on: macos-latest
+    needs: [git-check]
+    if: needs.git-check.outputs.modified == 'true'
+    strategy:
+      matrix:
+        target: [x86_64, aarch64]
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          REDUCE_RELEASE_TAG=$(cat release-versions/reduce-latest.txt)
+          # echo "REDUCE_RELEASE_TAG=$REDUCE_RELEASE_TAG" >> $GITHUB_OUTPUT
+          bash build_mac.sh "$REDUCE_RELEASE_TAG"
+          cd build && tar czf reduce-macos-${{ matrix.target }}.tar.gz *
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build/reduce-macos-${{ matrix.target }}.tar.gz
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [git-check, macos]
+    if: needs.git-check.outputs.modified == 'true'
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: build
+      - uses: ncipollo/release-action@v1
         with:
           allowUpdates: True
           tag: ${{ steps.build.outputs.REDUCE_RELEASE_TAG }}
           name: ${{ steps.build.outputs.REDUCE_RELEASE_TAG }}
           prerelease: False
-          artifacts: 'reduce.appimage'
+          artifacts: 'reduce.appimage,reduce-macos-x86_64.tar.gz,reduce-macos-aarch64.tar.gz'
           token: ${{ secrets.GITHUB_TOKEN }}
