@@ -39,13 +39,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 ```
 
-## optionaly, move it into your $PATH
-mv reduce.appimage /usr/local/bin/reduce
-reduce
-```
-
 ### What is this?
-A Docker build of Reduce Appimage
+1. For Linux, a Docker build of Reduce Appimage
+2. For macOS, a build script which generates `reduce.tar.gz`.
 
 ### Why use Docker?
 The advantages of using docker:
