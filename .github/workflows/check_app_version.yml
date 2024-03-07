@@ -54,7 +54,7 @@ jobs:
       matrix:
         target: [x86_64, aarch64]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           REDUCE_RELEASE_TAG=$(cat release-versions/reduce-latest.txt)
           # echo "REDUCE_RELEASE_TAG=$REDUCE_RELEASE_TAG" >> $GITHUB_OUTPUT
@@ -62,7 +62,7 @@ jobs:
           cd build && tar czf reduce-macos-${{ matrix.target }}.tar.gz *
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: build/reduce-macos-${{ matrix.target }}.tar.gz
@@ -73,7 +73,7 @@ jobs:
     needs: [get-version, macos]
     if: needs.get-version.outputs.modified == 'true'
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build
       - uses: ncipollo/release-action@v1
