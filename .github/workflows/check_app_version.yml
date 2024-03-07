@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       modified: ${{ steps.git-check.outputs.modified }}
+      release_tag: ${{ steps.build.outputs.REDUCE_RELEASE_TAG }}
     steps:
       - uses: actions/checkout@v4
       - name: Fetch release version
@@ -56,9 +57,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          REDUCE_RELEASE_TAG=$(cat release-versions/reduce-latest.txt)
-          # echo "REDUCE_RELEASE_TAG=$REDUCE_RELEASE_TAG" >> $GITHUB_OUTPUT
-          bash build_mac.sh "$REDUCE_RELEASE_TAG"
+          bash build_mac.sh ${{ needs.get-version.outputs.release_tag }}
           cd build && tar czf reduce-macos-${{ matrix.target }}.tar.gz *
 
       - name: Upload artifact
@@ -79,8 +78,8 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           allowUpdates: True
-          tag: ${{ steps.build.outputs.REDUCE_RELEASE_TAG }}
-          name: ${{ steps.build.outputs.REDUCE_RELEASE_TAG }}
+          tag: ${{ needs.get-version.outputs.release_tag }}
+          name: ${{ needs.get-version.outputs.release_tag }}
           prerelease: False
           artifacts: 'reduce.appimage,reduce-macos-x86_64.tar.gz,reduce-macos-aarch64.tar.gz'
           token: ${{ secrets.GITHUB_TOKEN }}
