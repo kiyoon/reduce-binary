@@ -1,16 +1,43 @@
 # Reduce AppImage
-![build](https://github.com/kiyoon/reduce-appimage/actions/workflows/check_app_version.yml/badge.svg)
+![build](https://github.com/kiyoon/reduce-binary/actions/workflows/check_app_version.yml/badge.svg)
 
 This utilises GitHub Action to **detect, build and release the latest version of the app as soon as they get released**.
 
 One-liner to get the latest reduce.appimage build:
 ```bash
-curl -s https://api.github.com/repos/kiyoon/reduce-appimage/releases/latest \
+curl -s https://api.github.com/repos/kiyoon/reduce-binary/releases/latest \
 | grep "browser_download_url.*appimage" \
 | cut -d : -f 2,3 \
 | tr -d \" \
 | wget -qi - \
 && chmod +x reduce.appimage
+
+## optionaly, move it into your $PATH
+mv reduce.appimage /usr/local/bin/reduce
+reduce
+```
+
+For macOS, get `.tar.gz`.
+
+```bash
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if [[ "$(uname -m)" == "arm64" ]]; then
+        curl -s https://api.github.com/repos/kiyoon/reduce-binary/releases/latest \
+        | grep "browser_download_url.*macos-aarch64.tar.gz" \
+        | cut -d : -f 2,3 \
+        | tr -d \" \
+        | wget -qi - \
+        && mv reduce-macos-aarch64.tar.gz reduce.tar.gz
+    else
+        curl -s https://api.github.com/repos/kiyoon/reduce-binary/releases/latest \
+        | grep "browser_download_url.*macos-x86_64.tar.gz" \
+        | cut -d : -f 2,3 \
+        | tr -d \" \
+        | wget -qi - \
+        && mv reduce-macos-x86_64.tar.gz reduce.tar.gz
+    fi
+fi
+```
 
 ## optionaly, move it into your $PATH
 mv reduce.appimage /usr/local/bin/reduce
