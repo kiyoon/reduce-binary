@@ -73,7 +73,7 @@ jobs:
     needs: [get-version, macos]
     if: needs.get-version.outputs.modified == 'true'
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: build
       - uses: ncipollo/release-action@v1
